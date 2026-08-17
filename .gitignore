@@ -5,9 +5,9 @@ bin/
 obj/
 artifacts/
 publish/
+tools/ffmpeg/*.exe
 *.user
 *.suo
 *.log
 logs/
 cache/
-

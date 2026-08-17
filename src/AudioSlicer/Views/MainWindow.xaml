@@ -11,6 +11,21 @@
   <Window.InputBindings>
     <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenMediaCommand}" />
     <KeyBinding Key="Space" Command="{Binding Player.TogglePlaybackCommand}" />
+    <KeyBinding Key="Left" Command="{Binding StepBackwardCommand}" />
+    <KeyBinding Key="Right" Command="{Binding StepForwardCommand}" />
+    <KeyBinding Key="Left" Modifiers="Shift" Command="{Binding FineStepBackwardCommand}" />
+    <KeyBinding Key="Right" Modifiers="Shift" Command="{Binding FineStepForwardCommand}" />
+    <KeyBinding Key="OemOpenBrackets" Command="{Binding SetSelectionStartCommand}" />
+    <KeyBinding Key="OemCloseBrackets" Command="{Binding SetSelectionEndCommand}" />
+    <KeyBinding Key="L" Command="{Binding ToggleLoopCommand}" />
+    <KeyBinding Key="Home" Command="{Binding GoSelectionStartCommand}" />
+    <KeyBinding Key="Escape" Command="{Binding ClearSelectionCommand}" />
+    <KeyBinding Key="Enter" Command="{Binding AddSegmentCommand}" />
+    <KeyBinding Key="Delete" Command="{Binding DeleteSelectedSegmentsCommand}" />
+    <KeyBinding Key="Z" Modifiers="Ctrl" Command="{Binding UndoCommand}" />
+    <KeyBinding Key="Y" Modifiers="Ctrl" Command="{Binding RedoCommand}" />
+    <KeyBinding Key="A" Modifiers="Ctrl" Command="{Binding SelectAllSegmentsCommand}" />
+    <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveProjectCommand}" />
   </Window.InputBindings>
 
   <Grid>
@@ -56,6 +71,11 @@
             <TextBlock Text="导入视频" />
           </StackPanel>
         </Button>
+        <StackPanel Grid.Column="2" HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,0,130,0">
+          <Button Margin="0,0,6,0" Padding="10,5" Command="{Binding OpenProjectCommand}" Content="打开工程" />
+          <Button Padding="10,5" Command="{Binding SaveProjectCommand}" Content="保存工程" />
+        </StackPanel>
+        <Button Grid.Column="3" Margin="0,0,118,0" Padding="8,5" Command="{Binding OpenMediaCancelCommand}" Content="取消" />
       </Grid>
     </Border>
 
@@ -79,7 +99,7 @@
                       HorizontalAlignment="Stretch"
                       ResizeDirection="Rows"
                       ResizeBehavior="PreviousAndNext" />
-        <views:WaveformView Grid.Row="2" DataContext="{Binding Waveform}" />
+        <views:WaveformView Grid.Row="2" />
       </Grid>
 
       <GridSplitter Grid.Column="1"
@@ -114,8 +134,14 @@
                    FontSize="12"
                    Foreground="{StaticResource MutedTextBrush}"
                    Text="原始媒体只读 · 时间为唯一真实数据" />
+        <ProgressBar Grid.Column="1"
+                     Width="180"
+                     Height="3"
+                     HorizontalAlignment="Right"
+                     VerticalAlignment="Bottom"
+                     Maximum="1"
+                     Value="{Binding OperationProgress, Mode=OneWay}" />
       </Grid>
     </Border>
   </Grid>
 </Window>
-

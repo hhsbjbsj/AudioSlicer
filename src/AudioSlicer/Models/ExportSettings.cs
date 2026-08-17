@@ -16,5 +16,6 @@ public sealed class ExportSettings
     public int Channels { get; set; } = 1;
 
     public int BitsPerSample { get; set; } = 16;
-}
 
+    public int Mp3BitRateKbps { get; set; } = 192;
+}

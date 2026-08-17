@@ -11,5 +11,13 @@ public sealed class AudioSliceProject
     public List<Segment> Segments { get; init; } = [];
 
     public ExportSettings ExportSettings { get; init; } = new();
+
+    public ProjectUiState UIState { get; init; } = new();
 }
 
+public sealed class ProjectUiState
+{
+    public double ViewportStartSeconds { get; set; }
+    public double ViewportDurationSeconds { get; set; }
+    public double CurrentTimeSeconds { get; set; }
+}

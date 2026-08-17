@@ -83,8 +83,7 @@ public sealed class LibVlcVideoPlayerService : IVideoPlayerService
         }
 
         using var media = new VlcMedia(_libVlc, new Uri(filePath));
-        var parsedStatus = await media.Parse(MediaParseOptions.ParseLocal, -1, cancellationToken)
-            .ConfigureAwait(false);
+        var parsedStatus = await media.Parse(MediaParseOptions.ParseLocal, -1, cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();
 

@@ -1,20 +1,27 @@
 # Audio Slicer
 
-Audio Slicer 是一款面向 Windows 的非破坏性视频辅助音频切片工具。当前代码完成 Phase 1：WPF/MVVM 应用骨架、深色主界面、媒体文件导入、LibVLC 视频播放、进度跳转、音量、倍速与统一时间显示。
+Audio Slicer 是一款 Windows x64 视频辅助音频切片器，使用 C#、.NET 10、WPF、MVVM、LibVLCSharp、FFmpeg/ffprobe 与 NAudio 开发。
 
-## 构建
+它专注于人工精确切片：视频与波形共用同一时间轴，所有编辑均为非破坏性决策，最终导出时才生成 WAV、FLAC 或 MP3。程序不包含 AI 识别、VAD、自动分段、自动降噪或说话人识别。
 
-仓库内 `.dotnet` 是本地开发 SDK（已被 Git 忽略）。在仓库根目录运行：
+## 功能
+
+- MP4、MKV、FLV 等视频预览，播放、暂停、跳转、音量与倍速。
+- 异步音频解码、多级峰值缓存、长视频波形缩放和平移。
+- 毫秒/亚毫秒时间输入、边界拖动、统一播放头与循环选区。
+- 片段创建、修改、重命名、多选、排序和 500 项虚拟化列表。
+- 片段内部删除与静音；删除拼接处使用几毫秒交叉淡化。
+- `Ctrl+Z`/`Ctrl+Y` 撤销重做。
+- JSON `.audioslice` 工程保存和恢复，视频哈希校验与重新定位。
+- WAV/FLAC/MP3 批量导出、Windows 文件名清理、冲突避让与 ZIP 打包。
+- 自包含 Windows x64 发布，无需安装 .NET、VLC 或 FFmpeg。
+
+## 构建与测试
 
 ```powershell
 .\.dotnet\dotnet.exe restore .\AudioSlicer.sln
-.\.dotnet\dotnet.exe build .\AudioSlicer.sln -c Release
+.\.dotnet\dotnet.exe test .\AudioSlicer.sln -c Release
+.\scripts\publish.ps1
 ```
 
-## 设计原则
-
-- 原始媒体始终只读。
-- 时间值是编辑数据的唯一事实来源，像素只负责显示。
-- 后续耗时媒体任务必须异步且支持取消。
-- 不包含 AI 识别、VAD、自动分段或自动降噪。
-
+最终包输出到 `publish\AudioSlicer-win-x64.zip`。

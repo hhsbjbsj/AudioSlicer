@@ -82,6 +82,15 @@
         <Setter Property="MinHeight" Value="32" />
       </Style>
 
+      <Style TargetType="TextBox">
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="Background" Value="{StaticResource PanelRaisedBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+        <Setter Property="CaretBrush" Value="{StaticResource PrimaryBrush}" />
+        <Setter Property="Padding" Value="7,5" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+      </Style>
+
       <Style TargetType="Slider">
         <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
       </Style>
@@ -98,4 +107,3 @@
     </ResourceDictionary>
   </Application.Resources>
 </Application>
-

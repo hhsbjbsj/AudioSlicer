@@ -20,6 +20,9 @@ public sealed partial class PlayerViewModel : ObservableObject, IDisposable
     private bool _isUpdatingFromPlayer;
     private bool _isSeeking;
     private bool _disposed;
+    private bool _isLooping;
+    private double _loopStartMilliseconds;
+    private double _loopEndMilliseconds;
 
     public PlayerViewModel(IVideoPlayerService playerService)
     {
@@ -76,12 +79,19 @@ public sealed partial class PlayerViewModel : ObservableObject, IDisposable
             if (SetProperty(ref _currentTimeMilliseconds, bounded))
             {
                 OnPropertyChanged(nameof(CurrentTimeText));
+                OnPropertyChanged(nameof(CurrentTimeSeconds));
                 if (!_isUpdatingFromPlayer && HasMedia)
                 {
                     _playerService.CurrentTime = TimeSpan.FromMilliseconds(bounded);
                 }
             }
         }
+    }
+
+    public double CurrentTimeSeconds
+    {
+        get => CurrentTimeMilliseconds / 1000;
+        set => CurrentTimeMilliseconds = value * 1000;
     }
 
     public double DurationMilliseconds
@@ -123,6 +133,29 @@ public sealed partial class PlayerViewModel : ObservableObject, IDisposable
                 _playerService.PlaybackRate = (float)value;
             }
         }
+    }
+
+    public bool IsLooping
+    {
+        get => _isLooping;
+        private set => SetProperty(ref _isLooping, value);
+    }
+
+    public void ConfigureLoop(double startSeconds, double endSeconds, bool enabled)
+    {
+        _loopStartMilliseconds = startSeconds * 1000;
+        _loopEndMilliseconds = endSeconds * 1000;
+        IsLooping = enabled && endSeconds > startSeconds;
+        if (IsLooping)
+        {
+            CurrentTimeMilliseconds = _loopStartMilliseconds;
+            _playerService.Play();
+        }
+    }
+
+    public void Step(double milliseconds)
+    {
+        CurrentTimeMilliseconds += milliseconds;
     }
 
     public async Task LoadAsync(string filePath, CancellationToken cancellationToken)
@@ -182,6 +215,12 @@ public sealed partial class PlayerViewModel : ObservableObject, IDisposable
         IsPlaying = _playerService.IsPlaying;
         DurationMilliseconds = _playerService.Duration.TotalMilliseconds;
 
+        if (IsLooping && _playerService.CurrentTime.TotalMilliseconds >= _loopEndMilliseconds)
+        {
+            _playerService.CurrentTime = TimeSpan.FromMilliseconds(_loopStartMilliseconds);
+            if (!_playerService.IsPlaying) _playerService.Play();
+        }
+
         if (_isSeeking && !forcePositionUpdate)
         {
             return;
@@ -218,4 +257,3 @@ public sealed partial class PlayerViewModel : ObservableObject, IDisposable
         _playerService.Dispose();
     }
 }
-
