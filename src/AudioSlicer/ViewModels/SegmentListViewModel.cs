@@ -53,9 +53,17 @@ public sealed class SegmentListViewModel : ObservableObject
 
     public void RemoveSelected()
     {
-        foreach (var item in SelectedItems.ToArray()) Segments.Remove(item);
-        _selectedIds.Clear();
-        if (ActiveSegment is not null && !Segments.Contains(ActiveSegment)) ActiveSegment = null;
+        Remove(SelectedItems);
+    }
+
+    public void Remove(IEnumerable<SegmentItemViewModel> items)
+    {
+        var removedIds = items.Select(item => item.Id).ToHashSet();
+        if (removedIds.Count == 0) return;
+        foreach (var item in Segments.Where(item => removedIds.Contains(item.Id)).ToArray()) Segments.Remove(item);
+        _selectedIds.ExceptWith(removedIds);
+        if (ActiveSegment is not null && removedIds.Contains(ActiveSegment.Id)) ActiveSegment = null;
+        OnPropertyChanged(nameof(SelectedItems));
         Renumber();
     }
 

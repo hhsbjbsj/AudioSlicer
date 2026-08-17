@@ -129,8 +129,17 @@
           <ListBox.ItemTemplate>
             <DataTemplate DataType="{x:Type vm:SegmentItemViewModel}">
               <Border Padding="12"
+                      Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
                       BorderThickness="1"
                       CornerRadius="15">
+                <Border.ContextMenu>
+                  <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                    <MenuItem Header="删除这一段"
+                              InputGestureText="Ctrl+Z 可撤销"
+                              Command="{Binding PlacementTarget.Tag.DeleteSegmentCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                              CommandParameter="{Binding}" />
+                  </ContextMenu>
+                </Border.ContextMenu>
                 <Border.Style>
                   <Style TargetType="Border">
                     <Setter Property="Background" Value="#F8F7FC" />
@@ -243,15 +252,24 @@
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
           <StackPanel VerticalAlignment="Center">
-            <TextBlock FontSize="12" FontWeight="SemiBold" Text="打包已勾选音频" />
+            <TextBlock FontSize="12" FontWeight="SemiBold" Text="管理已勾选音频" />
             <TextBlock Margin="0,3,0,0"
                        FontSize="10"
                        Foreground="{StaticResource MutedTextBrush}"
-                       Text="ZIP 内直接包含独立 WAV 文件" />
+                       Text="可以打包，也可以一键删除" />
           </StackPanel>
           <Button Grid.Column="1"
+                  MinWidth="106"
+                  Foreground="#D65372"
+                  Background="#FFF0F4"
+                  BorderBrush="#F7CCD8"
+                  Command="{Binding DeleteCheckedSegmentsCommand}"
+                  Content="删除勾选" />
+          <Button Grid.Column="3"
                   MinWidth="116"
                   Command="{Binding PackageTaskAudioCommand}"
                   Content="打包 ZIP" />

@@ -235,6 +235,26 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         StatusMessage = "已删除所选片段";
     }
 
+    [RelayCommand]
+    private void DeleteCheckedSegments()
+    {
+        var items = Segments.ExportItems.ToArray();
+        if (items.Length == 0) { StatusMessage = "请先勾选要删除的音频。"; return; }
+        _audioPreviewService.Stop();
+        RecordMutation(() => Segments.Remove(items));
+        StatusMessage = $"已删除 {items.Length} 个勾选音频，可按 Ctrl+Z 撤销";
+    }
+
+    [RelayCommand]
+    private void DeleteSegment(SegmentItemViewModel? item)
+    {
+        if (item is null || !Segments.Segments.Contains(item)) return;
+        _audioPreviewService.Stop();
+        var name = item.Name;
+        RecordMutation(() => Segments.Remove([item]));
+        StatusMessage = $"已删除：{name}，可按 Ctrl+Z 撤销";
+    }
+
     [RelayCommand] private void SelectAllSegments() => Segments.SelectAll();
     [RelayCommand] private void SortSegments() => Segments.SortByTime();
 

@@ -4,7 +4,7 @@ $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $dotnet = Join-Path $repositoryRoot '.dotnet\dotnet.exe'
 $project = Join-Path $repositoryRoot 'src\AudioSlicer\AudioSlicer.csproj'
 $publishRoot = Join-Path $repositoryRoot 'publish'
-$packageName = 'AudioSlicer-win-x64-v1.1.0'
+$packageName = 'AudioSlicer-win-x64-v1.1.1'
 $output = Join-Path $publishRoot $packageName
 $zip = Join-Path $publishRoot "$packageName.zip"
 

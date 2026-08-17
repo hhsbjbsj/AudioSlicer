@@ -3,6 +3,7 @@ using System.Threading;
 using System.Windows.Threading;
 using AudioSlicer.Export;
 using AudioSlicer.Media;
+using AudioSlicer.Models;
 using AudioSlicer.Project;
 using AudioSlicer.Services;
 using AudioSlicer.ViewModels;
@@ -65,6 +66,22 @@ public sealed class TaskAudioWorkflowTests
                     generatedAudio = item.AudioFilePath;
                     var info = await new FFprobeService(locator).ProbeAsync(item.AudioFilePath, CancellationToken.None);
                     Assert.InRange(info.Duration.TotalSeconds, 0.54, 0.56);
+
+                    var secondItem = viewModel.Segments.Add(new Segment
+                    {
+                        Name = "保留片段",
+                        StartTime = TimeSpan.FromSeconds(1.0),
+                        EndTime = TimeSpan.FromSeconds(1.5),
+                    });
+                    item.IsExportSelected = true;
+                    secondItem.IsExportSelected = false;
+                    viewModel.DeleteCheckedSegmentsCommand.Execute(null);
+                    Assert.Same(secondItem, Assert.Single(viewModel.Segments.Segments));
+                    Assert.Contains("已删除 1 个勾选音频", viewModel.StatusMessage);
+
+                    viewModel.DeleteSegmentCommand.Execute(secondItem);
+                    Assert.Empty(viewModel.Segments.Segments);
+                    Assert.Contains("已删除：保留片段", viewModel.StatusMessage);
                     window.Close();
                     completion.SetResult();
                 }
