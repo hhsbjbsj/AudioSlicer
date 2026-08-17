@@ -4,8 +4,9 @@ $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $dotnet = Join-Path $repositoryRoot '.dotnet\dotnet.exe'
 $project = Join-Path $repositoryRoot 'src\AudioSlicer\AudioSlicer.csproj'
 $publishRoot = Join-Path $repositoryRoot 'publish'
-$output = Join-Path $publishRoot 'AudioSlicer-win-x64'
-$zip = Join-Path $publishRoot 'AudioSlicer-win-x64.zip'
+$packageName = 'AudioSlicer-win-x64-v1.0.2'
+$output = Join-Path $publishRoot $packageName
+$zip = Join-Path $publishRoot "$packageName.zip"
 
 if (-not (Test-Path -LiteralPath (Join-Path $repositoryRoot 'tools\ffmpeg\ffmpeg.exe'))) {
     & (Join-Path $PSScriptRoot 'download-ffmpeg.ps1')

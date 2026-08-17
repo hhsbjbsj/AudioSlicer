@@ -7,6 +7,7 @@ using AudioSlicer.Project;
 using AudioSlicer.Services;
 using AudioSlicer.ViewModels;
 using AudioSlicer.Waveform;
+using AudioSlicer.Views;
 using Xunit;
 
 namespace AudioSlicer.Tests;
@@ -35,6 +36,11 @@ public sealed class TaskAudioWorkflowTests
                 MainViewModel? viewModel = null;
                 try
                 {
+                    if (System.Windows.Application.Current is null)
+                    {
+                        var application = new App();
+                        application.InitializeComponent();
+                    }
                     var player = new LibVlcVideoPlayerService();
                     var cache = new WaveformCache();
                     var exporter = new AudioExporter(locator);
@@ -46,6 +52,9 @@ public sealed class TaskAudioWorkflowTests
                         new ProjectSerializer(),
                         exporter,
                         new AudioPreviewService());
+                    var window = new MainWindow(viewModel);
+                    var segmentPanel = Assert.IsType<SegmentListView>(window.FindName("SegmentPanel"));
+                    Assert.Same(viewModel, segmentPanel.DataContext);
                     await viewModel.LoadMediaAsync(source, CancellationToken.None);
                     viewModel.Waveform.SetSelection(0.25, 0.80);
                     viewModel.AddSegmentCommand.Execute(null);
@@ -56,6 +65,7 @@ public sealed class TaskAudioWorkflowTests
                     generatedAudio = item.AudioFilePath;
                     var info = await new FFprobeService(locator).ProbeAsync(item.AudioFilePath, CancellationToken.None);
                     Assert.InRange(info.Duration.TotalSeconds, 0.54, 0.56);
+                    window.Close();
                     completion.SetResult();
                 }
                 catch (Exception exception)

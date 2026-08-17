@@ -108,7 +108,7 @@
                     ResizeDirection="Columns"
                     ResizeBehavior="PreviousAndNext" />
 
-      <views:SegmentListView Grid.Column="2" DataContext="{Binding Segments}" />
+      <views:SegmentListView x:Name="SegmentPanel" Grid.Column="2" />
     </Grid>
 
     <Border Grid.Row="2"
