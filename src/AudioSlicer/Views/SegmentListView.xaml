@@ -1,0 +1,57 @@
+<UserControl x:Class="AudioSlicer.Views.SegmentListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Border Background="{StaticResource PanelBrush}"
+          BorderBrush="{StaticResource BorderBrush}"
+          BorderThickness="1"
+          CornerRadius="7">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="42" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="54" />
+      </Grid.RowDefinitions>
+
+      <Border Grid.Row="0"
+              Padding="13,0"
+              BorderBrush="{StaticResource BorderBrush}"
+              BorderThickness="0,0,0,1">
+        <Grid>
+          <TextBlock FontSize="14" FontWeight="SemiBold" Text="音频片段" />
+          <Border HorizontalAlignment="Right"
+                  Padding="8,3"
+                  Background="{StaticResource PanelRaisedBrush}"
+                  CornerRadius="9">
+            <TextBlock FontSize="11"
+                       Foreground="{StaticResource MutedTextBrush}"
+                       Text="{Binding Segments.Count, StringFormat={}{0} 项}" />
+          </Border>
+        </Grid>
+      </Border>
+
+      <Grid Grid.Row="1" Margin="12">
+        <ListBox ItemsSource="{Binding Segments}"
+                 Background="Transparent"
+                 BorderThickness="0" />
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+          <TextBlock HorizontalAlignment="Center"
+                     FontSize="30"
+                     Foreground="#435064"
+                     Text="≡" />
+          <TextBlock Margin="0,8,0,0" FontWeight="SemiBold" Text="还没有音频片段" />
+          <TextBlock Margin="0,5,0,0"
+                     Foreground="{StaticResource MutedTextBrush}"
+                     Text="Phase 4 将在这里管理片段" />
+        </StackPanel>
+      </Grid>
+
+      <Border Grid.Row="2"
+              Padding="10"
+              BorderBrush="{StaticResource BorderBrush}"
+              BorderThickness="0,1,0,0">
+        <Button IsEnabled="False" Content="导出所选" />
+      </Border>
+    </Grid>
+  </Border>
+</UserControl>
+

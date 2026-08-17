@@ -1,0 +1,121 @@
+<Window x:Class="AudioSlicer.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:AudioSlicer.Views"
+        Title="Audio Slicer"
+        Width="1440"
+        Height="900"
+        MinWidth="1040"
+        MinHeight="680"
+        WindowStartupLocation="CenterScreen">
+  <Window.InputBindings>
+    <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenMediaCommand}" />
+    <KeyBinding Key="Space" Command="{Binding Player.TogglePlaybackCommand}" />
+  </Window.InputBindings>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="58" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="30" />
+    </Grid.RowDefinitions>
+
+    <Border Grid.Row="0"
+            Background="{StaticResource PanelBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="0,0,0,1">
+      <Grid Margin="16,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="18" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+          <TextBlock FontSize="19" FontWeight="SemiBold" Text="Audio Slicer" />
+          <Border Margin="10,0,0,0"
+                  Padding="7,2"
+                  Background="#25364A"
+                  CornerRadius="4">
+            <TextBlock FontSize="11" Foreground="{StaticResource PrimaryBrush}" Text="PHASE 1" />
+          </Border>
+        </StackPanel>
+
+        <TextBlock Grid.Column="2"
+                   Foreground="{StaticResource MutedTextBrush}"
+                   Text="{Binding MediaFileName}"
+                   TextTrimming="CharacterEllipsis" />
+
+        <Button Grid.Column="3"
+                Command="{Binding OpenMediaCommand}"
+                Style="{StaticResource PrimaryButtonStyle}"
+                ToolTip="导入视频（Ctrl+O）">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Margin="0,0,8,0" FontSize="16" Text="＋" />
+            <TextBlock Text="导入视频" />
+          </StackPanel>
+        </Button>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1" Margin="12">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" MinWidth="620" />
+        <ColumnDefinition Width="6" />
+        <ColumnDefinition Width="350" MinWidth="280" MaxWidth="600" />
+      </Grid.ColumnDefinitions>
+
+      <Grid Grid.Column="0">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="3*" MinHeight="300" />
+          <RowDefinition Height="6" />
+          <RowDefinition Height="2*" MinHeight="220" />
+        </Grid.RowDefinitions>
+
+        <views:VideoPlayerView Grid.Row="0" DataContext="{Binding Player}" />
+        <GridSplitter Grid.Row="1"
+                      Height="6"
+                      HorizontalAlignment="Stretch"
+                      ResizeDirection="Rows"
+                      ResizeBehavior="PreviousAndNext" />
+        <views:WaveformView Grid.Row="2" DataContext="{Binding Waveform}" />
+      </Grid>
+
+      <GridSplitter Grid.Column="1"
+                    Width="6"
+                    HorizontalAlignment="Stretch"
+                    ResizeDirection="Columns"
+                    ResizeBehavior="PreviousAndNext" />
+
+      <views:SegmentListView Grid.Column="2" DataContext="{Binding Segments}" />
+    </Grid>
+
+    <Border Grid.Row="2"
+            Background="{StaticResource PanelBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="0,1,0,0">
+      <Grid Margin="12,0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Ellipse Grid.Column="0"
+                 Width="7"
+                 Height="7"
+                 Margin="0,0,8,0"
+                 Fill="{StaticResource PrimaryBrush}" />
+        <TextBlock Grid.Column="1"
+                   FontSize="12"
+                   Foreground="{StaticResource MutedTextBrush}"
+                   Text="{Binding StatusMessage}" />
+        <TextBlock Grid.Column="2"
+                   FontSize="12"
+                   Foreground="{StaticResource MutedTextBrush}"
+                   Text="原始媒体只读 · 时间为唯一真实数据" />
+      </Grid>
+    </Border>
+  </Grid>
+</Window>
+

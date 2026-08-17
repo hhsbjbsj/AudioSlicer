@@ -1,0 +1,101 @@
+<Application x:Class="AudioSlicer.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Application.Resources>
+    <ResourceDictionary>
+      <Color x:Key="WindowColor">#111318</Color>
+      <Color x:Key="PanelColor">#191C23</Color>
+      <Color x:Key="PanelRaisedColor">#222630</Color>
+      <Color x:Key="BorderColor">#343946</Color>
+      <Color x:Key="PrimaryColor">#63B3FF</Color>
+      <Color x:Key="PrimaryHoverColor">#86C4FF</Color>
+      <Color x:Key="TextColor">#F3F5F7</Color>
+      <Color x:Key="MutedTextColor">#9CA6B6</Color>
+
+      <SolidColorBrush x:Key="WindowBrush" Color="{StaticResource WindowColor}" />
+      <SolidColorBrush x:Key="PanelBrush" Color="{StaticResource PanelColor}" />
+      <SolidColorBrush x:Key="PanelRaisedBrush" Color="{StaticResource PanelRaisedColor}" />
+      <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}" />
+      <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
+      <SolidColorBrush x:Key="PrimaryHoverBrush" Color="{StaticResource PrimaryHoverColor}" />
+      <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}" />
+      <SolidColorBrush x:Key="MutedTextBrush" Color="{StaticResource MutedTextColor}" />
+
+      <Style TargetType="Window">
+        <Setter Property="Background" Value="{StaticResource WindowBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+      </Style>
+
+      <Style TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+      </Style>
+
+      <Style TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="Background" Value="{StaticResource PanelRaisedBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="14,8" />
+        <Setter Property="MinHeight" Value="34" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+          <Setter.Value>
+            <ControlTemplate TargetType="Button">
+              <Border x:Name="Border"
+                      Padding="{TemplateBinding Padding}"
+                      Background="{TemplateBinding Background}"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}"
+                      CornerRadius="5">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+              <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                  <Setter TargetName="Border" Property="Background" Value="#2B303C" />
+                  <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource PrimaryBrush}" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                  <Setter TargetName="Border" Property="Opacity" Value="0.8" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                  <Setter TargetName="Border" Property="Opacity" Value="0.42" />
+                </Trigger>
+              </ControlTemplate.Triggers>
+            </ControlTemplate>
+          </Setter.Value>
+        </Setter>
+      </Style>
+
+      <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Background" Value="#1769AA" />
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}" />
+      </Style>
+
+      <Style TargetType="ComboBox">
+        <Setter Property="Foreground" Value="#111318" />
+        <Setter Property="Background" Value="{StaticResource PanelRaisedBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+        <Setter Property="Padding" Value="8,5" />
+        <Setter Property="MinHeight" Value="32" />
+      </Style>
+
+      <Style TargetType="Slider">
+        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+      </Style>
+
+      <Style TargetType="GridSplitter">
+        <Setter Property="Background" Value="{StaticResource WindowBrush}" />
+      </Style>
+
+      <Style TargetType="ToolTip">
+        <Setter Property="Background" Value="#2B303C" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+      </Style>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>
+

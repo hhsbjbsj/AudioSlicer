@@ -1,0 +1,26 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioSlicer", "src\AudioSlicer\AudioSlicer.csproj", "{1BCBEE7A-677A-4B44-85F3-94F50DAED155}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioSlicer.Tests", "tests\AudioSlicer.Tests\AudioSlicer.Tests.csproj", "{009FB858-CC0E-4B55-9198-42802D7D28D7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1BCBEE7A-677A-4B44-85F3-94F50DAED155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BCBEE7A-677A-4B44-85F3-94F50DAED155}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BCBEE7A-677A-4B44-85F3-94F50DAED155}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BCBEE7A-677A-4B44-85F3-94F50DAED155}.Release|Any CPU.Build.0 = Release|Any CPU
+		{009FB858-CC0E-4B55-9198-42802D7D28D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{009FB858-CC0E-4B55-9198-42802D7D28D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{009FB858-CC0E-4B55-9198-42802D7D28D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{009FB858-CC0E-4B55-9198-42802D7D28D7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
+

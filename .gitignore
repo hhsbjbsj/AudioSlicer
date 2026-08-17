@@ -1,0 +1,13 @@
+.vs/
+.idea/
+.dotnet/
+bin/
+obj/
+artifacts/
+publish/
+*.user
+*.suo
+*.log
+logs/
+cache/
+
