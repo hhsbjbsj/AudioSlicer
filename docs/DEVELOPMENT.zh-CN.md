@@ -47,11 +47,9 @@ dotnet test .\AudioSlicer.sln -c Release
 8. 计算 ZIP 的 SHA-256。
 9. 创建 Git tag 和 GitHub Release，并把 ZIP 作为 Release 资产上传。
 
-## GitHub 自动检查
+## 自动检查建议
 
-.github/workflows/build.yml 会在 push 和 pull request 时安装固定版本 .NET SDK、下载 FFmpeg、Restore 并执行 Release 测试。
-
-发布包仍建议在受控 Windows 环境中运行 publish.ps1 并完成实机验收后上传。
+提交前至少运行 `dotnet test .\AudioSlicer.sln -c Release`。发布包应在受控 Windows 环境中运行 `publish.ps1`，完成实机验收后再上传；如果以后接入 CI，可复用“安装固定版本 .NET SDK → 下载 FFmpeg → Restore → Release 测试”这条流程。
 
 ## 日志和诊断
 

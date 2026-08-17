@@ -1,4 +1,3 @@
 # Media module
 
-Phase 1 contains the LibVLC preview service. FFprobe, FFmpeg-based decoding and precise export are intentionally introduced in later phases so preview seeking and sample-accurate export remain separate concerns.
-
+This module contains the LibVLC preview service and the FFprobe/FFmpeg media pipeline. Preview seeking and precise export remain separate concerns so interactive playback cannot change the selected export boundaries.
