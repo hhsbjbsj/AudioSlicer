@@ -19,7 +19,7 @@
       </Border>
 
       <WrapPanel Grid.Row="1" Margin="8">
-        <Button Margin="0,0,5,5" Padding="9,4" Command="{Binding AddSegmentCommand}" Content="添加 (Enter)" />
+        <Button Margin="0,0,5,5" Padding="9,4" Command="{Binding AddSegmentCommand}" Content="生成音频并加入 (Enter)" />
         <Button Margin="0,0,5,5" Padding="9,4" Command="{Binding UpdateActiveSegmentCutsCommand}" Content="更新切点" />
         <Button Margin="0,0,5,5" Padding="9,4" Command="{Binding DeleteRangeCommand}" Content="删除区间" />
         <Button Margin="0,0,5,5" Padding="9,4" Command="{Binding MuteRangeCommand}" Content="静音区间" />
@@ -63,6 +63,18 @@
                   </StackPanel>
                   <TextBlock Margin="0,5,0,0" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="{Binding RangeText}" />
                   <TextBlock Margin="0,2,0,0" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="{Binding EditSummary}" />
+                  <TextBlock Margin="0,4,0,0" FontSize="11" Foreground="{StaticResource PrimaryBrush}" Text="{Binding FileStatus}" ToolTip="{Binding AudioFilePath}" />
+                  <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                    <Button Padding="8,3"
+                            Command="{Binding DataContext.PlayTaskAudioCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            Content="播放音频文件" />
+                    <Button Margin="5,0,0,0"
+                            Padding="8,3"
+                            Command="{Binding DataContext.RegenerateTaskAudioCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}"
+                            Content="重新生成" />
+                  </StackPanel>
                 </StackPanel>
                 <TextBlock Grid.Column="2" Margin="8,0,0,0" VerticalAlignment="Top" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Text="{Binding DurationText}" />
               </Grid>
@@ -79,8 +91,8 @@
       </Grid>
       <Grid Grid.Row="4" Margin="8,0,8,8">
         <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="8" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-        <Button Grid.Column="0" Command="{Binding ExportSelectedCommand}" Content="导出勾选" />
-        <Button Grid.Column="2" Command="{Binding ExportZipCommand}" Content="导出并打包 ZIP" />
+        <Button Grid.Column="0" Command="{Binding ExportSelectedCommand}" Content="导出勾选到文件夹" />
+        <Button Grid.Column="2" Command="{Binding PackageTaskAudioCommand}" Content="打包任务音频 ZIP" />
       </Grid>
     </Grid>
   </Border>

@@ -27,8 +27,9 @@ public partial class App : Application
             var waveformGenerator = new Waveform.WaveformGenerator(ffmpegLocator, waveformCache);
             var projectSerializer = new Project.ProjectSerializer();
             var audioExporter = new Export.AudioExporter(ffmpegLocator);
+            var audioPreviewService = new AudioPreviewService();
 
-            _mainViewModel = new MainViewModel(playerService, fileDialogService, ffprobeService, waveformGenerator, projectSerializer, audioExporter);
+            _mainViewModel = new MainViewModel(playerService, fileDialogService, ffprobeService, waveformGenerator, projectSerializer, audioExporter, audioPreviewService);
             MainWindow = new MainWindow(_mainViewModel);
             MainWindow.Show();
             if (e.Args.Length > 0 && File.Exists(e.Args[0]))

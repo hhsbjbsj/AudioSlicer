@@ -158,6 +158,8 @@ public sealed partial class PlayerViewModel : ObservableObject, IDisposable
         CurrentTimeMilliseconds += milliseconds;
     }
 
+    public void PausePlayback() => _playerService.Pause();
+
     public async Task LoadAsync(string filePath, CancellationToken cancellationToken)
     {
         await _playerService.OpenAsync(filePath, cancellationToken);

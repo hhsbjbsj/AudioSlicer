@@ -1,4 +1,5 @@
 using System.IO;
+using System.IO.Compression;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using AudioSlicer.Media;
@@ -18,6 +19,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private readonly WaveformGenerator _waveformGenerator;
     private readonly ProjectSerializer _projectSerializer;
     private readonly AudioExporter _audioExporter;
+    private readonly AudioPreviewService _audioPreviewService;
     private readonly UndoManager<EditorSnapshot> _undoManager = new();
     private string _statusMessage = "请选择视频文件开始工作";
     private string _mediaFileName = "尚未导入媒体";
@@ -34,13 +36,15 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         FFprobeService ffprobeService,
         WaveformGenerator waveformGenerator,
         ProjectSerializer projectSerializer,
-        AudioExporter audioExporter)
+        AudioExporter audioExporter,
+        AudioPreviewService audioPreviewService)
     {
         _fileDialogService = fileDialogService;
         _ffprobeService = ffprobeService;
         _waveformGenerator = waveformGenerator;
         _projectSerializer = projectSerializer;
         _audioExporter = audioExporter;
+        _audioPreviewService = audioPreviewService;
         Player = new PlayerViewModel(playerService);
         Waveform = new WaveformViewModel();
         Segments = new SegmentListViewModel();
@@ -155,12 +159,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand] private void GoSelectionStart() => Player.CurrentTimeSeconds = Waveform.SelectionStartSeconds;
 
     [RelayCommand]
-    private void AddSegment()
+    private async Task AddSegmentAsync(CancellationToken cancellationToken)
     {
         if (!Waveform.HasSelection) { StatusMessage = "请先在波形上选择音频区间。"; return; }
+        SegmentItemViewModel? item = null;
         RecordMutation(() =>
         {
-            var item = Segments.Add(new Segment
+            item = Segments.Add(new Segment
             {
                 Name = $"片段 {Segments.Segments.Count + 1:000}",
                 StartTime = TimeSpan.FromSeconds(Waveform.SelectionStartSeconds),
@@ -169,7 +174,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             Segments.ActiveSegment = item;
             Segments.SortByTime();
         });
-        StatusMessage = "已添加非破坏性片段";
+        StatusMessage = "正在生成独立任务音频…";
+        await RenderTaskAudioAsync(item!, cancellationToken);
     }
 
     [RelayCommand]
@@ -186,7 +192,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private void UpdateActiveSegmentCuts()
+    private async Task UpdateActiveSegmentCutsAsync(CancellationToken cancellationToken)
     {
         var item = Segments.ActiveSegment;
         if (item is null || !Waveform.HasSelection) { StatusMessage = "请先双击片段并选择新的边界。"; return; }
@@ -199,13 +205,14 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             item.Refresh();
             Segments.SortByTime();
         });
-        StatusMessage = "片段切点已更新";
+        await RenderTaskAudioAsync(item, cancellationToken);
+        StatusMessage = "片段切点和独立音频文件已更新";
     }
 
-    [RelayCommand] private void DeleteRange() => AddInternalRange(deleted: true);
-    [RelayCommand] private void MuteRange() => AddInternalRange(deleted: false);
+    [RelayCommand] private Task DeleteRangeAsync(CancellationToken cancellationToken) => AddInternalRangeAsync(deleted: true, cancellationToken);
+    [RelayCommand] private Task MuteRangeAsync(CancellationToken cancellationToken) => AddInternalRangeAsync(deleted: false, cancellationToken);
 
-    private void AddInternalRange(bool deleted)
+    private async Task AddInternalRangeAsync(bool deleted, CancellationToken cancellationToken)
     {
         var item = Segments.ActiveSegment;
         if (item is null || !Waveform.HasSelection) { StatusMessage = "请先双击片段，再框选片段内部的小区间。"; return; }
@@ -216,7 +223,8 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             (deleted ? item.Model.DeletedRanges : item.Model.MutedRanges).Add(range);
             item.Refresh();
         });
-        StatusMessage = deleted ? "已记录删除区间（原媒体未修改）" : "已记录静音区间（原媒体未修改）";
+        await RenderTaskAudioAsync(item, cancellationToken);
+        StatusMessage = deleted ? "删除区间已应用到独立音频文件" : "静音区间已应用到独立音频文件";
     }
 
     [RelayCommand]
@@ -241,12 +249,13 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private void ClearActiveSegmentEdits()
+    private async Task ClearActiveSegmentEditsAsync(CancellationToken cancellationToken)
     {
         var item = Segments.ActiveSegment;
         if (item is null) return;
         RecordMutation(() => { item.Model.DeletedRanges.Clear(); item.Model.MutedRanges.Clear(); item.Refresh(); });
-        StatusMessage = "已清除当前片段的内部删除和静音标记";
+        await RenderTaskAudioAsync(item, cancellationToken);
+        StatusMessage = "已清除内部编辑并更新独立音频文件";
     }
 
     public void SetSelectedSegments(IEnumerable<SegmentItemViewModel> selected) => Segments.SetSelected(selected);
@@ -265,17 +274,19 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand(CanExecute = nameof(CanUndo))]
-    private void Undo()
+    private async Task UndoAsync()
     {
         RestoreSnapshot(_undoManager.Undo(CaptureSnapshot()));
+        await RefreshAllTaskAudioAsync(CancellationToken.None);
         RefreshUndoCommands();
         StatusMessage = "已撤销";
     }
 
     [RelayCommand(CanExecute = nameof(CanRedo))]
-    private void Redo()
+    private async Task RedoAsync()
     {
         RestoreSnapshot(_undoManager.Redo(CaptureSnapshot()));
+        await RefreshAllTaskAudioAsync(CancellationToken.None);
         RefreshUndoCommands();
         StatusMessage = "已重做";
     }
@@ -333,6 +344,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             Player.CurrentTimeSeconds = project.UIState.CurrentTimeSeconds;
             ProjectPath = path;
             _undoManager.Clear(); RefreshUndoCommands();
+            await RefreshAllTaskAudioAsync(cancellationToken);
             StatusMessage = "工程已恢复";
         }
         catch (Exception exception) { AppLogger.Error("打开工程失败", exception); StatusMessage = $"打开工程失败：{exception.Message}"; }
@@ -369,6 +381,145 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
         finally { IsBusy = false; OperationProgress = 0; }
     }
 
+    [RelayCommand]
+    private void PlayTaskAudio(SegmentItemViewModel? item)
+    {
+        if (item is null || !item.HasAudioFile)
+        {
+            StatusMessage = "该任务的独立音频尚未生成。";
+            return;
+        }
+
+        try
+        {
+            Player.PausePlayback();
+            _audioPreviewService.Play(item.AudioFilePath);
+            StatusMessage = $"正在播放独立音频：{item.Name}";
+        }
+        catch (Exception exception)
+        {
+            AppLogger.Error("播放任务音频失败", exception);
+            StatusMessage = $"播放失败：{exception.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task RegenerateTaskAudioAsync(SegmentItemViewModel? item, CancellationToken cancellationToken)
+    {
+        if (item is not null) await RenderTaskAudioAsync(item, cancellationToken);
+    }
+
+    [RelayCommand(IncludeCancelCommand = true)]
+    private async Task PackageTaskAudioAsync(CancellationToken cancellationToken)
+    {
+        var items = Segments.ExportItems.ToArray();
+        if (items.Length == 0) { StatusMessage = "请先勾选要打包的任务音频。"; return; }
+        var zipPath = _fileDialogService.SelectZipPath($"{Path.GetFileNameWithoutExtension(MediaPath)}_任务音频.zip");
+        if (string.IsNullOrWhiteSpace(zipPath)) return;
+
+        IsBusy = true;
+        OperationProgress = 0;
+        StatusMessage = "正在准备并打包任务音频…";
+        var temporaryZip = zipPath + ".partial";
+        try
+        {
+            for (var index = 0; index < items.Length; index++)
+            {
+                if (!items[index].HasAudioFile) await RenderTaskAudioAsync(items[index], cancellationToken);
+                if (!items[index].HasAudioFile) throw new InvalidOperationException($"任务“{items[index].Name}”的音频文件生成失败。");
+                OperationProgress = (index + 0.5) / items.Length;
+            }
+
+            if (File.Exists(temporaryZip)) File.Delete(temporaryZip);
+            await using (var zipStream = new FileStream(temporaryZip, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 65536, true))
+            using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, leaveOpen: false))
+            {
+                var usedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                for (var index = 0; index < items.Length; index++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var baseName = SanitizeTaskFileName(items[index].Name);
+                    var entryName = $"{baseName}.wav";
+                    for (var suffix = 2; !usedNames.Add(entryName); suffix++) entryName = $"{baseName}_{suffix}.wav";
+                    var entry = archive.CreateEntry(entryName, CompressionLevel.Optimal);
+                    await using var source = new FileStream(items[index].AudioFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, true);
+                    await using var destination = entry.Open();
+                    await source.CopyToAsync(destination, cancellationToken);
+                    OperationProgress = (index + 1d) / items.Length;
+                }
+            }
+            File.Move(temporaryZip, zipPath, overwrite: true);
+            StatusMessage = $"已把 {items.Length} 个独立音频文件打包完成";
+        }
+        catch (OperationCanceledException) { StatusMessage = "打包已取消"; }
+        catch (Exception exception) { AppLogger.Error("任务音频打包失败", exception); StatusMessage = $"打包失败：{exception.Message}"; }
+        finally
+        {
+            if (File.Exists(temporaryZip)) File.Delete(temporaryZip);
+            IsBusy = false;
+            OperationProgress = 0;
+        }
+    }
+
+    private async Task<bool> RenderTaskAudioAsync(SegmentItemViewModel item, CancellationToken cancellationToken)
+    {
+        item.IsRendering = true;
+        item.FileStatus = "正在生成独立 WAV…";
+        try
+        {
+            var directory = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "AudioSlicer",
+                "task-audio",
+                string.IsNullOrWhiteSpace(MediaHash) ? "unsaved" : MediaHash);
+            Directory.CreateDirectory(directory);
+            var path = Path.Combine(directory, $"{item.Id:N}.wav");
+            await _audioExporter.ExportOneAsync(
+                MediaPath,
+                item.Model.Clone(),
+                path,
+                new ExportSettings { Format = AudioExportFormat.Wav, SampleRate = 48_000, Channels = 1, BitsPerSample = 16 },
+                cancellationToken);
+            item.AudioFilePath = path;
+            item.FileStatus = $"独立 WAV 已生成 · {new FileInfo(path).Length / 1024d:0.#} KB";
+            StatusMessage = $"已生成音频并加入任务栏：{item.Name}";
+            return true;
+        }
+        catch (OperationCanceledException)
+        {
+            item.FileStatus = "生成已取消";
+            return false;
+        }
+        catch (Exception exception)
+        {
+            item.AudioFilePath = string.Empty;
+            item.FileStatus = $"生成失败：{exception.Message}";
+            AppLogger.Error($"生成任务音频失败：{item.Name}", exception);
+            StatusMessage = item.FileStatus;
+            return false;
+        }
+        finally
+        {
+            item.IsRendering = false;
+        }
+    }
+
+    private async Task RefreshAllTaskAudioAsync(CancellationToken cancellationToken)
+    {
+        foreach (var item in Segments.Segments)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await RenderTaskAudioAsync(item, cancellationToken);
+        }
+    }
+
+    private static string SanitizeTaskFileName(string name)
+    {
+        var invalid = Path.GetInvalidFileNameChars();
+        var value = new string(name.Select(character => invalid.Contains(character) ? '_' : character).ToArray()).Trim().TrimEnd('.');
+        return string.IsNullOrWhiteSpace(value) ? "audio_segment" : value;
+    }
+
     private void RecordMutation(Action mutation)
     {
         var before = CaptureSnapshot(); mutation(); var after = CaptureSnapshot();
@@ -398,5 +549,9 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     private sealed record EditorSnapshot(List<Segment> Segments, Guid? ActiveId);
 
     private bool CanOpenMedia() => !IsBusy;
-    public void Dispose() => Player.Dispose();
+    public void Dispose()
+    {
+        _audioPreviewService.Dispose();
+        Player.Dispose();
+    }
 }
