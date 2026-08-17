@@ -1,10 +1,14 @@
 $ErrorActionPreference = 'Stop'
 
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
-$dotnet = Join-Path $repositoryRoot '.dotnet\dotnet.exe'
+$localDotnet = Join-Path $repositoryRoot '.dotnet\dotnet.exe'
+$dotnet = if (Test-Path -LiteralPath $localDotnet) { $localDotnet } else { (Get-Command dotnet -ErrorAction Stop).Source }
 $project = Join-Path $repositoryRoot 'src\AudioSlicer\AudioSlicer.csproj'
 $publishRoot = Join-Path $repositoryRoot 'publish'
-$packageName = 'AudioSlicer-win-x64-v1.1.1'
+[xml]$projectXml = Get-Content -Raw -LiteralPath $project
+$version = [string]($projectXml.Project.PropertyGroup.Version | Select-Object -First 1)
+if ([string]::IsNullOrWhiteSpace($version)) { throw 'Project version was not found in AudioSlicer.csproj.' }
+$packageName = "AudioSlicer-win-x64-v$version"
 $output = Join-Path $publishRoot $packageName
 $zip = Join-Path $publishRoot "$packageName.zip"
 
