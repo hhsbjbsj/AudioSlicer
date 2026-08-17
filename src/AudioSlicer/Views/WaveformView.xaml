@@ -2,39 +2,90 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:waveform="clr-namespace:AudioSlicer.Waveform">
-  <Border Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="7">
+  <Border Style="{StaticResource CardStyle}">
     <Grid>
       <Grid.RowDefinitions>
-        <RowDefinition Height="42" />
+        <RowDefinition Height="52" />
         <RowDefinition Height="*" />
-        <RowDefinition Height="48" />
+        <RowDefinition Height="66" />
       </Grid.RowDefinitions>
-      <Border Grid.Row="0" Padding="13,0" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
-        <Grid>
-          <TextBlock FontSize="14" FontWeight="SemiBold" Text="音频波形与时间轴" />
-          <TextBlock HorizontalAlignment="Right" Foreground="{StaticResource MutedTextBrush}" Text="滚轮缩放 · Shift+滚轮平移 · 右键拖动画布" />
-        </Grid>
-      </Border>
-      <waveform:WaveformEditorControl Grid.Row="1"
-                                      Margin="8"
-                                      Waveform="{Binding Waveform.Data}"
-                                      CurrentTimeSeconds="{Binding Player.CurrentTimeSeconds, Mode=TwoWay}"
-                                      SelectionStartSeconds="{Binding Waveform.SelectionStartSeconds, Mode=TwoWay}"
-                                      SelectionEndSeconds="{Binding Waveform.SelectionEndSeconds, Mode=TwoWay}"
-                                      ViewportStartSeconds="{Binding Waveform.ViewportStartSeconds, Mode=TwoWay}"
-                                      ViewportDurationSeconds="{Binding Waveform.ViewportDurationSeconds, Mode=TwoWay}" />
-      <Border Grid.Row="2" Padding="10,7" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
-        <StackPanel Orientation="Horizontal">
-          <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="开始" />
-          <TextBox Width="108" Margin="7,0,14,0" Text="{Binding Waveform.SelectionStartText, UpdateSourceTrigger=PropertyChanged}" />
-          <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="结束" />
-          <TextBox Width="108" Margin="7,0,14,0" Text="{Binding Waveform.SelectionEndText, UpdateSourceTrigger=PropertyChanged}" />
-          <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="长度" />
-          <TextBlock Width="92" Margin="7,0,14,0" FontFamily="Consolas" Text="{Binding Waveform.SelectionDurationText}" />
-          <Button Padding="10,4" Command="{Binding ApplySelectionTimesCommand}" Content="应用时间" />
-          <Button Margin="7,0,0,0" Padding="10,4" Command="{Binding ToggleLoopCommand}" Content="循环选区 (L)" />
+
+      <Grid Grid.Row="0" Margin="16,0">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+          <Border Width="30" Height="30" Background="#E9E5FF" CornerRadius="10">
+            <TextBlock HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="{StaticResource PrimaryBrush}"
+                       Text="⌁" />
+          </Border>
+          <TextBlock Margin="10,0,0,0" FontSize="15" FontWeight="Bold" Text="波形选区" />
         </StackPanel>
+        <TextBlock HorizontalAlignment="Right"
+                   FontSize="11"
+                   Foreground="{StaticResource MutedTextBrush}"
+                   Text="滚轮缩放  ·  Shift + 滚轮平移  ·  右键拖动画布" />
+      </Grid>
+
+      <Border Grid.Row="1"
+              Margin="12,0"
+              Background="#FAF9FF"
+              BorderBrush="#E5E1F2"
+              BorderThickness="1"
+              CornerRadius="14"
+              ClipToBounds="True">
+        <waveform:WaveformEditorControl Waveform="{Binding Waveform.Data}"
+                                        CurrentTimeSeconds="{Binding Player.CurrentTimeSeconds, Mode=TwoWay}"
+                                        SelectionStartSeconds="{Binding Waveform.SelectionStartSeconds, Mode=TwoWay}"
+                                        SelectionEndSeconds="{Binding Waveform.SelectionEndSeconds, Mode=TwoWay}"
+                                        ViewportStartSeconds="{Binding Waveform.ViewportStartSeconds, Mode=TwoWay}"
+                                        ViewportDurationSeconds="{Binding Waveform.ViewportDurationSeconds, Mode=TwoWay}" />
       </Border>
+
+      <Grid Grid.Row="2" Margin="14,8,14,10">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="12" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="14" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="8" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0">
+          <TextBlock Margin="2,0,0,3" FontSize="10" Foreground="{StaticResource MutedTextBrush}" Text="开始" />
+          <TextBox Width="112"
+                   FontFamily="Consolas"
+                   Text="{Binding Waveform.SelectionStartText, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+        <StackPanel Grid.Column="2">
+          <TextBlock Margin="2,0,0,3" FontSize="10" Foreground="{StaticResource MutedTextBrush}" Text="结束" />
+          <TextBox Width="112"
+                   FontFamily="Consolas"
+                   Text="{Binding Waveform.SelectionEndText, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+        <StackPanel Grid.Column="4">
+          <TextBlock Margin="2,0,0,3" FontSize="10" Foreground="{StaticResource MutedTextBrush}" Text="选区长度" />
+          <Border Height="38" Padding="11,0" Background="#F1EFFF" CornerRadius="10">
+            <TextBlock MinWidth="74"
+                       FontFamily="Consolas"
+                       Foreground="{StaticResource PrimaryBrush}"
+                       Text="{Binding Waveform.SelectionDurationText}" />
+          </Border>
+        </StackPanel>
+        <Button Grid.Column="6"
+                Margin="0,15,0,0"
+                Padding="13,6"
+                Command="{Binding ApplySelectionTimesCommand}"
+                Content="应用时间" />
+        <Button Grid.Column="8"
+                Margin="0,15,0,0"
+                Padding="13,6"
+                Command="{Binding ToggleLoopCommand}"
+                Content="↻  循环试听" />
+      </Grid>
     </Grid>
   </Border>
 </UserControl>

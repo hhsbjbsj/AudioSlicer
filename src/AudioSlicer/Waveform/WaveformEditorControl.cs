@@ -37,7 +37,7 @@ public sealed class WaveformEditorControl : FrameworkElement
     protected override void OnRender(DrawingContext context)
     {
         base.OnRender(context);
-        context.DrawRectangle(new SolidColorBrush(Color.FromRgb(18, 21, 27)), null, new Rect(RenderSize));
+        context.DrawRectangle(new SolidColorBrush(Color.FromRgb(250, 249, 255)), null, new Rect(RenderSize));
         if (Waveform is null || ActualWidth <= 1 || ActualHeight <= 1)
         {
             DrawCenteredText(context, "正在等待波形数据…");
@@ -52,13 +52,15 @@ public sealed class WaveformEditorControl : FrameworkElement
         {
             var left = TimeToX(SelectionStartSeconds);
             var right = TimeToX(SelectionEndSeconds);
-            context.DrawRectangle(new SolidColorBrush(Color.FromArgb(65, 74, 163, 255)), null, new Rect(left, timelineHeight, right - left, ActualHeight - timelineHeight));
+            context.DrawRectangle(new SolidColorBrush(Color.FromArgb(48, 108, 99, 255)), null, new Rect(left, timelineHeight, right - left, ActualHeight - timelineHeight));
         }
 
         var level = Waveform.SelectLevel(ViewportDurationSeconds, ActualWidth);
         var startIndex = Math.Max(0, (int)Math.Floor(ViewportStartSeconds * Waveform.SampleRate / level.SamplesPerPeak));
         var endIndex = Math.Min(level.Peaks.Length, (int)Math.Ceiling((ViewportStartSeconds + ViewportDurationSeconds) * Waveform.SampleRate / level.SamplesPerPeak));
-        var pen = new Pen(new SolidColorBrush(Color.FromRgb(83, 179, 255)), 1);
+        var centerPen = new Pen(new SolidColorBrush(Color.FromRgb(231, 227, 244)), 1);
+        context.DrawLine(centerPen, new Point(0, centerY), new Point(ActualWidth, centerY));
+        var pen = new Pen(new SolidColorBrush(Color.FromRgb(108, 99, 255)), 1);
         pen.Freeze();
         for (var index = startIndex; index < endIndex; index++)
         {
@@ -68,9 +70,9 @@ public sealed class WaveformEditorControl : FrameworkElement
             context.DrawLine(pen, new Point(x, centerY - peak.Maximum * amplitude), new Point(x, centerY - peak.Minimum * amplitude));
         }
 
-        DrawMarker(context, SelectionStartSeconds, Color.FromRgb(112, 197, 255), 2);
-        DrawMarker(context, SelectionEndSeconds, Color.FromRgb(112, 197, 255), 2);
-        DrawMarker(context, CurrentTimeSeconds, Color.FromRgb(255, 93, 93), 2);
+        DrawMarker(context, SelectionStartSeconds, Color.FromRgb(67, 199, 215), 2);
+        DrawMarker(context, SelectionEndSeconds, Color.FromRgb(67, 199, 215), 2);
+        DrawMarker(context, CurrentTimeSeconds, Color.FromRgb(255, 94, 145), 2);
     }
 
     protected override void OnMouseWheel(MouseWheelEventArgs e)
@@ -121,18 +123,18 @@ public sealed class WaveformEditorControl : FrameworkElement
 
     private void DrawTimeline(DrawingContext context, double height)
     {
-        var count = Math.Max(2, (int)(ActualWidth / 140)); var pen = new Pen(new SolidColorBrush(Color.FromRgb(55, 62, 76)), 1);
+        var count = Math.Max(2, (int)(ActualWidth / 140)); var pen = new Pen(new SolidColorBrush(Color.FromRgb(221, 217, 236)), 1);
         for (var index = 0; index <= count; index++)
         {
             var x = index * ActualWidth / count; var time = ViewportStartSeconds + index * ViewportDurationSeconds / count;
             context.DrawLine(pen, new Point(x, height - 6), new Point(x, height));
-            var text = new FormattedText(FormatTick(time), CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, new Typeface("Consolas"), 10, new SolidColorBrush(Color.FromRgb(156, 166, 182)), VisualTreeHelper.GetDpi(this).PixelsPerDip);
+            var text = new FormattedText(FormatTick(time), CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, new Typeface("Consolas"), 10, new SolidColorBrush(Color.FromRgb(125, 120, 151)), VisualTreeHelper.GetDpi(this).PixelsPerDip);
             context.DrawText(text, new Point(Math.Clamp(x - text.Width / 2, 2, Math.Max(2, ActualWidth - text.Width - 2)), 2));
         }
     }
 
     private void DrawMarker(DrawingContext context, double time, Color color, double thickness) { var x = TimeToX(time); if (x >= 0 && x <= ActualWidth) context.DrawLine(new Pen(new SolidColorBrush(color), thickness), new Point(x, 0), new Point(x, ActualHeight)); }
-    private void DrawCenteredText(DrawingContext context, string value) { var text = new FormattedText(value, CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, new Typeface("Segoe UI"), 14, Brushes.Gray, VisualTreeHelper.GetDpi(this).PixelsPerDip); context.DrawText(text, new Point((ActualWidth - text.Width) / 2, (ActualHeight - text.Height) / 2)); }
+    private void DrawCenteredText(DrawingContext context, string value) { var text = new FormattedText(value, CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, new Typeface("Segoe UI Variable Text"), 14, new SolidColorBrush(Color.FromRgb(125, 120, 151)), VisualTreeHelper.GetDpi(this).PixelsPerDip); context.DrawText(text, new Point((ActualWidth - text.Width) / 2, (ActualHeight - text.Height) / 2)); }
     private string FormatTick(double seconds) => ViewportDurationSeconds < 1 ? TimeSpan.FromSeconds(seconds).ToString(@"mm\:ss\.fff", CultureInfo.InvariantCulture) : TimeSpan.FromSeconds(seconds).ToString(seconds >= 3600 ? @"hh\:mm\:ss" : @"mm\:ss", CultureInfo.InvariantCulture);
     private static DependencyProperty Register(string name, Type type, object? value) => DependencyProperty.Register(name, type, typeof(WaveformEditorControl), new FrameworkPropertyMetadata(value, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, Redraw));
     private static void Redraw(DependencyObject target, DependencyPropertyChangedEventArgs e) => ((WaveformEditorControl)target).InvalidateVisual();

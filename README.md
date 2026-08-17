@@ -25,4 +25,4 @@ Audio Slicer 是一款 Windows x64 视频辅助音频切片器，使用 C#、.NE
 .\scripts\publish.ps1
 ```
 
-最终包输出到 `publish\AudioSlicer-win-x64-v1.0.2.zip`。
+最终包输出到 `publish\AudioSlicer-win-x64-v1.1.0.zip`。

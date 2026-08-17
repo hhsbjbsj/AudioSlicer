@@ -3,132 +3,167 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
              xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF">
-  <Border Background="{StaticResource PanelBrush}"
-          BorderBrush="{StaticResource BorderBrush}"
-          BorderThickness="1"
-          CornerRadius="7">
+  <Border Style="{StaticResource CardStyle}">
     <Grid>
       <Grid.RowDefinitions>
-        <RowDefinition Height="42" />
+        <RowDefinition Height="52" />
         <RowDefinition Height="*" />
-        <RowDefinition Height="88" />
+        <RowDefinition Height="94" />
       </Grid.RowDefinitions>
 
-      <Border Grid.Row="0"
-              Padding="13,0"
-              BorderBrush="{StaticResource BorderBrush}"
-              BorderThickness="0,0,0,1">
-        <Grid>
-          <TextBlock FontSize="14" FontWeight="SemiBold" Text="视频预览" />
-          <TextBlock HorizontalAlignment="Right"
-                     Foreground="{StaticResource MutedTextBrush}"
-                     Text="LibVLC" />
-        </Grid>
-      </Border>
-
-      <Grid Grid.Row="1" Background="#050607">
-        <vlc:VideoView MediaPlayer="{Binding MediaPlayer}" />
-        <StackPanel HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    IsHitTestVisible="False">
-          <TextBlock HorizontalAlignment="Center"
-                     FontSize="40"
-                     Foreground="#435064"
-                     Text="▶" />
-          <TextBlock Margin="0,8,0,0"
-                     Foreground="{StaticResource MutedTextBrush}"
-                     Text="导入视频后在此预览" />
-          <StackPanel.Style>
-            <Style TargetType="StackPanel">
-              <Setter Property="Visibility" Value="Visible" />
-              <Style.Triggers>
-                <DataTrigger Binding="{Binding HasMedia}" Value="True">
-                  <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
-              </Style.Triggers>
-            </Style>
-          </StackPanel.Style>
+      <Grid Grid.Row="0" Margin="16,0">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+          <Border Width="30" Height="30" Background="#E5F7FA" CornerRadius="10">
+            <TextBlock HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       Foreground="{StaticResource SecondaryBrush}"
+                       Text="▶" />
+          </Border>
+          <TextBlock Margin="10,0,0,0" FontSize="15" FontWeight="Bold" Text="视频预览" />
         </StackPanel>
+        <Border Padding="9,4"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Background="#ECF8F9"
+                CornerRadius="10">
+          <TextBlock FontSize="10"
+                     FontWeight="SemiBold"
+                     Foreground="#2795A4"
+                     Text="与波形同步" />
+        </Border>
       </Grid>
 
-      <Border Grid.Row="2"
-              Padding="12,9"
-              BorderBrush="{StaticResource BorderBrush}"
-              BorderThickness="0,1,0,0">
+      <Border Grid.Row="1"
+              Margin="12,0"
+              Background="#26243A"
+              CornerRadius="15"
+              ClipToBounds="True">
         <Grid>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-          </Grid.RowDefinitions>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-          </Grid.ColumnDefinitions>
-
-          <TextBlock Grid.Row="0"
-                     Grid.Column="0"
-                     Width="78"
-                     FontFamily="Consolas"
-                     FontSize="12"
-                     Foreground="{StaticResource PrimaryBrush}"
-                     Text="{Binding CurrentTimeText}" />
-          <Slider x:Name="SeekSlider"
-                  Grid.Row="0"
-                  Grid.Column="1"
-                  Margin="8,0"
-                  IsEnabled="{Binding HasMedia}"
-                  Maximum="{Binding DurationMilliseconds}"
-                  Minimum="0"
-                  primitives:Thumb.DragCompleted="OnSeekDragCompleted"
-                  primitives:Thumb.DragStarted="OnSeekDragStarted"
-                  Value="{Binding CurrentTimeMilliseconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-          <TextBlock Grid.Row="0"
-                     Grid.Column="2"
-                     Width="78"
-                     FontFamily="Consolas"
-                     FontSize="12"
-                     Foreground="{StaticResource MutedTextBrush}"
-                     Text="{Binding DurationText}"
-                     TextAlignment="Right" />
-
-          <StackPanel Grid.Row="1"
-                      Grid.Column="0"
-                      Grid.ColumnSpan="3"
-                      Margin="0,8,0,0"
-                      Orientation="Horizontal">
-            <Button MinWidth="82"
-                    Command="{Binding TogglePlaybackCommand}"
-                    Content="{Binding PlayPauseLabel}"
-                    ToolTip="播放/暂停（Space）" />
-            <Button Margin="8,0,0,0"
-                    Command="{Binding StopCommand}"
-                    Content="停止" />
-            <TextBlock Margin="22,0,8,0"
-                       Foreground="{StaticResource MutedTextBrush}"
-                       Text="音量" />
-            <Slider Width="108"
-                    IsMoveToPointEnabled="True"
-                    Maximum="100"
-                    Minimum="0"
-                    Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <TextBlock Margin="22,0,8,0"
-                       Foreground="{StaticResource MutedTextBrush}"
-                       Text="倍速" />
-            <ComboBox Width="84"
-                      ItemsSource="{Binding PlaybackRates}"
-                      SelectedItem="{Binding SelectedPlaybackRate, Mode=TwoWay}"
-                      ToolTip="播放速度">
-              <ComboBox.ItemTemplate>
-                <DataTemplate>
-                  <TextBlock Foreground="#111318" Text="{Binding StringFormat={}{0:0.##}×}" />
-                </DataTemplate>
-              </ComboBox.ItemTemplate>
-            </ComboBox>
-          </StackPanel>
+          <vlc:VideoView MediaPlayer="{Binding MediaPlayer}" />
+          <Border Background="{StaticResource SoftAccentGradientBrush}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+              <Border Width="72" Height="72" Background="#DDD8FF" CornerRadius="28">
+                <TextBlock Margin="4,0,0,0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="27"
+                           Foreground="{StaticResource PrimaryBrush}"
+                           Text="▶" />
+              </Border>
+              <TextBlock Margin="0,16,0,0"
+                         HorizontalAlignment="Center"
+                         FontSize="15"
+                         FontWeight="SemiBold"
+                         Text="导入视频，开始捕捉喜欢的声音" />
+              <TextBlock Margin="0,6,0,0"
+                         Foreground="{StaticResource MutedTextBrush}"
+                         Text="画面、声音与波形会保持同步" />
+            </StackPanel>
+            <Border.Style>
+              <Style TargetType="Border">
+                <Setter Property="Visibility" Value="Visible" />
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding HasMedia}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </Border.Style>
+          </Border>
         </Grid>
       </Border>
+
+      <Grid Grid.Row="2" Margin="16,8,16,12">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Grid.Column="0"
+                   Width="78"
+                   FontFamily="Consolas"
+                   FontSize="12"
+                   FontWeight="SemiBold"
+                   Foreground="{StaticResource PrimaryBrush}"
+                   Text="{Binding CurrentTimeText}" />
+        <Slider x:Name="SeekSlider"
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="9,0"
+                IsEnabled="{Binding HasMedia}"
+                Maximum="{Binding DurationMilliseconds}"
+                Minimum="0"
+                primitives:Thumb.DragCompleted="OnSeekDragCompleted"
+                primitives:Thumb.DragStarted="OnSeekDragStarted"
+                Value="{Binding CurrentTimeMilliseconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock Grid.Row="0"
+                   Grid.Column="2"
+                   Width="78"
+                   FontFamily="Consolas"
+                   FontSize="12"
+                   Foreground="{StaticResource MutedTextBrush}"
+                   Text="{Binding DurationText}"
+                   TextAlignment="Right" />
+
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,8,0,0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="22" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="118" />
+            <ColumnDefinition Width="22" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="88" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <Button Grid.Column="0"
+                  MinWidth="88"
+                  Padding="14,6"
+                  Command="{Binding TogglePlaybackCommand}"
+                  Content="{Binding PlayPauseLabel}"
+                  Style="{StaticResource PrimaryButtonStyle}"
+                  ToolTip="播放/暂停（Space）" />
+          <Button Grid.Column="1"
+                  Margin="8,0,0,0"
+                  Padding="13,6"
+                  Command="{Binding StopCommand}"
+                  Content="停止" />
+          <TextBlock Grid.Column="3"
+                     Margin="0,0,8,0"
+                     FontSize="11"
+                     Foreground="{StaticResource MutedTextBrush}"
+                     Text="音量" />
+          <Slider Grid.Column="4"
+                  IsMoveToPointEnabled="True"
+                  Maximum="100"
+                  Minimum="0"
+                  Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Grid.Column="6"
+                     Margin="0,0,8,0"
+                     FontSize="11"
+                     Foreground="{StaticResource MutedTextBrush}"
+                     Text="倍速" />
+          <ComboBox Grid.Column="7"
+                    Padding="7,4"
+                    ItemsSource="{Binding PlaybackRates}"
+                    SelectedItem="{Binding SelectedPlaybackRate, Mode=TwoWay}"
+                    ToolTip="播放速度">
+            <ComboBox.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding StringFormat={}{0:0.##}×}" />
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </Grid>
+      </Grid>
     </Grid>
   </Border>
 </UserControl>
-
