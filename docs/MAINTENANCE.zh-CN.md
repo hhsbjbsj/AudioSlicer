@@ -1,6 +1,6 @@
 # 维护与后续升级注意事项
 
-## 当前稳定产品范围（v1.1.1）
+## 当前稳定产品范围（v1.1.2）
 
 已经完成并暴露在 UI 中：
 
@@ -50,6 +50,10 @@ LibVLCSharp 的视频宿主涉及 WPF Airspace。不要假设任意 WPF 控件�
 ### 发布目录被锁定
 
 运行中的 Windows EXE 会锁定部分文件。发布目录包含版本号，升级时创建新目录；不要强杀用户正在使用的旧进程，也不要在锁定失败后扩大删除范围。
+
+### 中文路径导入时报 JSON 转义错误
+
+FFprobe 的 JSON 标准输出必须显式按 UTF-8 读取。只设置 StandardErrorEncoding 会让无控制台的 WPF 进程使用系统中文代码页读取标准输出，破坏路径中的反斜杠转义。ProcessRunner 必须同时保留 StandardOutputEncoding 和 StandardErrorEncoding 的 UTF-8 设置及其回归测试。
 
 ## 不可破坏的约束
 

@@ -45,4 +45,4 @@ publish/AudioSlicer-win-x64-v<Version>.zip
 - [版本记录](CHANGELOG.md)
 - [第三方组件声明](THIRD_PARTY_NOTICES.md)
 
-当前稳定版本：1.1.1。
+当前稳定版本：1.1.2。
