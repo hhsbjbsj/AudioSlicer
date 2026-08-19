@@ -47,6 +47,7 @@ public static class ProcessRunner
             CreateNoWindow = true,
             RedirectStandardError = true,
             RedirectStandardOutput = redirectStandardOutput,
+            StandardOutputEncoding = Encoding.UTF8,
             StandardErrorEncoding = Encoding.UTF8,
         };
         foreach (var argument in arguments)
@@ -79,4 +80,3 @@ public static class ProcessRunner
         return normalized.Length <= maximumLength ? normalized : normalized[^maximumLength..];
     }
 }
-

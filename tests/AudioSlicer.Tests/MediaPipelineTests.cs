@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text;
 using AudioSlicer.Media;
 using AudioSlicer.Waveform;
 using Xunit;
@@ -11,9 +12,9 @@ public sealed class MediaPipelineTests
     public async Task ProbeAndWaveformGeneration_WorkForSyntheticMedia()
     {
         var locator = new FFmpegLocator();
-        var temporaryDirectory = Path.Combine(Path.GetTempPath(), $"AudioSlicerTests-{Guid.NewGuid():N}");
+        var temporaryDirectory = Path.Combine(Path.GetTempPath(), $"AudioSlicerTests-中文路径-{Guid.NewGuid():N}");
         Directory.CreateDirectory(temporaryDirectory);
-        var mediaPath = Path.Combine(temporaryDirectory, "sample.mp4");
+        var mediaPath = Path.Combine(temporaryDirectory, "出发.mp4");
         try
         {
             await ProcessRunner.RunForTextAsync(
@@ -36,5 +37,15 @@ public sealed class MediaPipelineTests
         {
             if (Directory.Exists(temporaryDirectory)) Directory.Delete(temporaryDirectory, recursive: true);
         }
+    }
+
+    [Fact]
+    public void ProcessRunner_UsesUtf8ForRedirectedOutput()
+    {
+        var locator = new FFmpegLocator();
+        using var process = ProcessRunner.CreateProcess(locator.FFprobePath, ["-version"], redirectStandardOutput: true);
+
+        Assert.Equal(Encoding.UTF8.CodePage, process.StartInfo.StandardOutputEncoding?.CodePage);
+        Assert.Equal(Encoding.UTF8.CodePage, process.StartInfo.StandardErrorEncoding?.CodePage);
     }
 }
